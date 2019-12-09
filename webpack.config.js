@@ -1,11 +1,11 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
-  entry: "./src/index.js",
-  mode: process.env.NODE_ENV || "development",
+  entry: './src/index.js',
+  mode: process.env.NODE_ENV || 'development',
   output: {
-    filename: "main.js",
-    path: path.resolve(__dirname, "dist")
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
@@ -13,12 +13,12 @@ module.exports = {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
           options: {
-            presets: ["@babel/preset-react"]
-          }
-        }
-      }
-    ]
-  }
+            presets: ['@babel/preset-react'],
+          },
+        },
+      },
+    ],
+  },
 };

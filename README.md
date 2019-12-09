@@ -6,3 +6,27 @@ Reproduces a chrome bug that results in runaway indexeddb usage.
 - clone the repo
 - `npm i && npm start`
 - visit http://localhost:3000 in your browser
+
+## Chrome bug submission
+
+
+### Please enter a one-line summary
+
+Multiple concurrent IndexedDB operations leads to linearly increasing disk usage.  
+
+### Do you have a reduced test case?
+[ This repo ]
+
+### Does this feature work correctly in other browsers?
+
+
+
+### Steps to reproduce the problem:
+
+
+### What is the expected behavior?
+
+
+### What went wrong?
+
+### Did this work before?
