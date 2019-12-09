@@ -123,7 +123,7 @@ class App extends React.Component {
           <i> Number of iterations of creating and deleting IndexedDB instances.</i>
         </div>
        <button disabled={this.state.startedExperiment} onClick={this.startExperiment}>Start Experiment</button>
-        <h1>Time elapsed: {(Date.now() - this.state.experimentStartTime) / 1000 }s</h1>
+        <h1>Time elapsed: {this.state.experimentStartTime ? (Date.now() - this.state.experimentStartTime) / 1000 : 0}s</h1>
         <i>Note: It takes about 85 seconds to create the first data point. You'll see that number increase as indexeddb usage increases.</i>
         <Chart
           title={'idb storage estimate (Mb)'}
