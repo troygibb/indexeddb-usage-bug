@@ -68,8 +68,8 @@ const collectMetrics = async () => {
     );
   }
   const estimate = await navigator.storage.estimate();
-  if (!estimate.usageDetails.indexedDB) {
-    console.error('indexedDB estimate not found');
+  if (!estimate || !estimate.usageDetails || !estimate.usageDetails.indexedDB) {
+    console.error('Estimate details not found.');
     return null;
   }
   const { indexedDB: idbStorageEstimate } = estimate.usageDetails;
