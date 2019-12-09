@@ -1,17 +1,16 @@
-import React from "react";
-import Chart from "./chart";
+import React from 'react';
+import Chart from './chart';
 
-const STORE_NAME = "store";
+const STORE_NAME = 'store';
 
-const open = async name =>
-  new Promise((resolve, reject) => {
+const open = async (name) => new Promise((resolve, reject) => {
     const request = indexedDB.open(name, 1);
     request.onerror = reject;
-    request.onsuccess = e => resolve(e.target.result);
-    request.onupgradeneeded = e => {
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onupgradeneeded = (e) => {
       const db = e.target.result;
       const store = db.createObjectStore(STORE_NAME, {
-        autoIncrement: true
+        autoIncrement: true,
       });
       store.transaction.oncomplete = () => {
         resolve(db);
@@ -20,9 +19,8 @@ const open = async name =>
     };
   });
 
-const fill = async db =>
-  new Promise(async (resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
+const fill = async (db) => new Promise(async (resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
     tx.oncomplete = resolve;
     tx.onerror = reject;
     const store = tx.objectStore(STORE_NAME);
@@ -33,26 +31,22 @@ const fill = async db =>
     }
   });
 
-const deleteIdb = async name =>
-  new Promise((resolve, reject) => {
+const deleteIdb = async (name) => new Promise((resolve, reject) => {
     const request = indexedDB.deleteDatabase(name);
     request.onerror = reject;
     request.onsuccess = resolve;
     request.onblocked = reject;
   });
 
-const delay = (ms = Math.random() * 10) =>
-  new Promise(resolve =>
-    setTimeout(() => {
+const delay = (ms = Math.random() * 10) => new Promise((resolve) => setTimeout(() => {
       console.log(ms);
       resolve();
-    }, ms)
-  );
+    }, ms));
 
 const deleteCreate = async () => {
   try {
     await Promise.all(
-      ["left", "right"].map(async prefix => {
+      ['left', 'right'].map(async (prefix) => {
         for (let i = 0; i < 5; i++) {
           const name = `${prefix}-${i}`;
           await deleteIdb(name);
@@ -60,7 +54,7 @@ const deleteCreate = async () => {
           await fill(db);
           db.close();
         }
-      })
+      }),
     );
   } catch (e) {
     console.error(e);
@@ -70,24 +64,18 @@ const deleteCreate = async () => {
 const collectMetrics = async () => {
   if (!navigator || !navigator.storage || !navigator.storage.estimate) {
     throw new Error(
-      "navigator.storage.estimate not supported; this repro only supports the latest version of Google Chrome"
+      'navigator.storage.estimate not supported; this repro only supports the latest version of Google Chrome',
     );
   }
   const estimate = await navigator.storage.estimate();
-  if (!estimate.indexedDB) {
-    console.error("indexedDB estimate not found");
+  if (!estimate.usageDetails.indexedDB) {
+    console.error('indexedDB estimate not found');
     return null;
   }
   const { indexedDB: idbStorageEstimate } = estimate.usageDetails;
   const databases = await window.indexedDB.databases();
   return { idbStorageEstimate, numberOfDbs: databases.length };
 };
-
-/*
-TODO:
-  - run prettier
-
-*/
 
 // Takes about 85s to create the first data point.
 class App extends React.Component {
@@ -100,7 +88,7 @@ class App extends React.Component {
       timesElapsed: [],
       timeToDeleteCreate: [],
       startedExperiment: false,
-      experimentStartTime: 0
+      experimentStartTime: 0,
     };
     this.startExperiment = this.startExperiment.bind(this);
   }
@@ -120,16 +108,16 @@ class App extends React.Component {
         numberOfDbs: [...numberOfDbs, metrics.numberOfDbs],
         idbStorageEstimates: [
           ...idbStorageEstimates,
-          metrics.idbStorageEstimate / 1e6
+          metrics.idbStorageEstimate / 1e6,
         ],
         timesElapsed: [
           ...timesElapsed,
-          (Date.now() - this.state.experimentStartTime) / 1000
+          (Date.now() - this.state.experimentStartTime) / 1000,
         ],
         timeToDeleteCreate: [
           ...this.state.timeToDeleteCreate,
-          timeToDeleteCreate
-        ]
+          timeToDeleteCreate,
+        ],
       });
       await delay(100);
     }
@@ -139,10 +127,10 @@ class App extends React.Component {
     return (
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column"
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
         }}
       >
         <div>
@@ -152,13 +140,13 @@ class App extends React.Component {
             min="1"
             max="100"
             disabled={this.state.startedExperiment}
-            onChange={e => {
+            onChange={(e) => {
               this.setState({ numberOfOps: e.target.value });
             }}
             value={this.state.numberOfOps}
           />
           <i>
-            {" "}
+            {' '}
             Number of iterations of creating and deleting IndexedDB instances.
           </i>
         </div>
@@ -174,13 +162,17 @@ class App extends React.Component {
         </i>
         <div
           style={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-around"
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%',
+            justifyContent: 'space-around',
           }}
         >
-          <h1>Current iteration: {this.state.timesElapsed.length}</h1>
+          <h1>
+Current iteration:
+{' '}
+{this.state.timesElapsed.length}
+</h1>
           <h1>
             Time elapsed:
             {this.state.experimentStartTime
@@ -198,7 +190,7 @@ class App extends React.Component {
           title="idb storage estimate (Mb)"
           data={this.state.idbStorageEstimates.map((estimateMb, i) => ({
             estimateMb,
-            timeElapsed: Math.floor(this.state.timesElapsed[i])
+            timeElapsed: Math.floor(this.state.timesElapsed[i]),
           }))}
           dataKey="estimateMb"
           yAxisLabel="Mb"
@@ -207,7 +199,7 @@ class App extends React.Component {
           title="# of dbs"
           data={this.state.numberOfDbs.map((num, i) => ({
             num,
-            timeElapsed: Math.floor(this.state.timesElapsed[i])
+            timeElapsed: Math.floor(this.state.timesElapsed[i]),
           }))}
           dataKey="num"
           yAxisLabel="#"
@@ -216,7 +208,7 @@ class App extends React.Component {
           title="time to create and delete dbs"
           data={this.state.timeToDeleteCreate.map((time, i) => ({
             time,
-            timeElapsed: Math.floor(this.state.timesElapsed[i])
+            timeElapsed: Math.floor(this.state.timesElapsed[i]),
           }))}
           dataKey="time"
           yAxisLabel="s"
