@@ -152,7 +152,9 @@ class App extends React.Component {
           dataKey={'time'}
           yAxisLabel="s"
         />
- 
+        <p>
+        <b>navigator.userAgent: </b><i>{navigator.userAgent}</i>
+        </p>
       </div>
     )
   }
