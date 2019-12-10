@@ -24,9 +24,9 @@ const fill = async (db) => new Promise(async (resolve, reject) => {
     tx.oncomplete = resolve;
     tx.onerror = reject;
     const store = tx.objectStore(STORE_NAME);
-    for (let i = 0; i < 1000; i++) {
-      // 1Mb * 1000 = 1Gb per database
-      const request = store.add({ data: new ArrayBuffer(1e6) /* 1Mb */ });
+    for (let i = 0; i < 100; i++) {
+      // 1Mb * 100 = 0.1Gb per database
+      const request = store.add({ data: new Uint8Array(1e6).map(_ => Math.random() * 1000) /* 1Mb */ });
       request.onerror = reject;
     }
   });
@@ -46,13 +46,20 @@ const delay = (ms = Math.random() * 10) => new Promise((resolve) => setTimeout((
 const deleteCreate = async () => {
   try {
     await Promise.all(
-      ['left', 'right'].map(async (prefix) => {
-        for (let i = 0; i < 5; i++) {
+      // ~0.5Gb per branch 
+      ['left', 'center', 'right'].map(async (prefix) => {
+        // 0.1Gb per database
+        const dbIterators = new Array(4).fill().map((_, i) => i);
+        for (const i of dbIterators) {
           const name = `${prefix}-${i}`;
+          console.log(`Deleting ${name}...`)
           await deleteIdb(name);
+          console.log(`Creating ${name}...`)
           const db = await open(name);
+          console.log(`Filling ${name}...`)
           await fill(db);
           db.close();
+          console.log(`Finished with ${name}.`)
         }
       }),
     );
