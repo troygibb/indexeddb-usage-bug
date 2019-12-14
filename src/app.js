@@ -42,30 +42,31 @@ const delay = (ms = Math.random() * 10) => new Promise((resolve) => setTimeout((
       console.log(ms);
       resolve();
     }, ms));
+/*
+Step 1.
+1. Delete all tableflow dbs
+2. Create new tableflow db
+3. Fill tableflow db with js objects
+
+Step 2.
+Promise.all(
+[
+  1. Delete all bag dbs
+  2. create new bag dbs
+  3. Fill bag db with arraybuffers
+],
+[1. read through tableflow db]
+)
+
+III.
+Reload page
+
+IV.
+Rpeat
+*/
 
 const deleteCreate = async () => {
-  try {
-    await Promise.all(
-      // ~0.5Gb per branch 
-      ['left', 'center', 'right'].map(async (prefix) => {
-        // 0.1Gb per database
-        const dbIterators = new Array(4).fill().map((_, i) => i);
-        for (const i of dbIterators) {
-          const name = `${prefix}-${i}`;
-          console.log(`Deleting ${name}...`)
-          await deleteIdb(name);
-          console.log(`Creating ${name}...`)
-          const db = await open(name);
-          console.log(`Filling ${name}...`)
-          await fill(db);
-          db.close();
-          console.log(`Finished with ${name}.`)
-        }
-      }),
-    );
-  } catch (e) {
-    console.error(e);
-  }
+
 };
 
 const collectMetrics = async () => {

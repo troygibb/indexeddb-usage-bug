@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script>
+      const basicDatatypes = {
+        something: [
+          {
+            isArray: true,
+            isComplex: true,
+            name: "markers",
+            type: "visualization_msgs/Marker",
+            arrayLength: undefined
+          },
+          {
+            isArray: true,
+            isComplex: true,
+            name: "futureMarkers",
+            type: "visualization_msgs/Marker",
+            arrayLength: undefined
+          }
+        ],
+        "visualization_msgs/MarkerArray": [
+          {
+            isArray: true,
+            isComplex: true,
+            arrayLength: undefined,
+            name: "markers",
+            type: "visualization_msgs/Marker"
+          }
+        ],
+        "visualization_msgs/Marker": [
+          { type: "uint8", name: "ARROW", isConstant: true, value: 0 },
+          { type: "uint8", name: "CUBE", isConstant: true, value: 1 },
+          { type: "uint8", name: "SPHERE", isConstant: true, value: 2 },
+          { type: "uint8", name: "CYLINDER", isConstant: true, value: 3 },
+          { type: "uint8", name: "LINE_STRIP", isConstant: true, value: 4 },
+          { type: "uint8", name: "LINE_LIST", isConstant: true, value: 5 },
+          { type: "uint8", name: "CUBE_LIST", isConstant: true, value: 6 },
+          { type: "uint8", name: "SPHERE_LIST", isConstant: true, value: 7 },
+          { type: "uint8", name: "POINTS", isConstant: true, value: 8 },
+          {
+            type: "uint8",
+            name: "TEXT_VIEW_FACING",
+            isConstant: true,
+            value: 9
+          },
+          { type: "uint8", name: "MESH_RESOURCE", isConstant: true, value: 10 },
+          { type: "uint8", name: "TRIANGLE_LIST", isConstant: true, value: 11 },
+          { type: "uint8", name: "ADD", isConstant: true, value: 0 },
+          { type: "uint8", name: "MODIFY", isConstant: true, value: 0 },
+          { type: "uint8", name: "DELETE", isConstant: true, value: 2 },
+          {
+            type: "std_msgs/Header",
+            name: "header",
+            isArray: false,
+            isComplex: true
+          },
+          { type: "string", name: "ns", isArray: false, isComplex: false },
+          { type: "int32", name: "id", isArray: false, isComplex: false },
+          { type: "int32", name: "type", isArray: false, isComplex: false },
+          { type: "int32", name: "action", isArray: false, isComplex: false },
+          {
+            type: "geometry_msgs/Pose",
+            name: "pose",
+            isArray: false,
+            isComplex: true
+          },
+          {
+            type: "geometry_msgs/Vector3",
+            name: "scale",
+            isArray: false,
+            isComplex: true
+          },
+          {
+            type: "std_msgs/ColorRGBA",
+            name: "color",
+            isArray: false,
+            isComplex: true
+          },
+          {
+            type: "duration",
+            name: "lifetime",
+            isArray: false,
+            isComplex: false
+          },
+          {
+            type: "bool",
+            name: "frame_locked",
+            isArray: false,
+            isComplex: false
+          },
+          {
+            type: "geometry_msgs/Point",
+            name: "points",
+            isArray: true,
+            arrayLength: undefined,
+            isComplex: true
+          },
+          {
+            type: "std_msgs/ColorRGBA",
+            name: "colors",
+            isArray: true,
+            arrayLength: undefined,
+            isComplex: true
+          },
+          { type: "string", name: "text", isArray: false, isComplex: false },
+          {
+            type: "string",
+            name: "mesh_resource",
+            isArray: false,
+            isComplex: false
+          },
+          {
+            type: "bool",
+            name: "mesh_use_embedded_materials",
+            isArray: false,
+            isComplex: false
+          }
+        ],
+        "std_msgs/ColorRGBA": [
+          { type: "float32", name: "r", isArray: false, isComplex: false },
+          { type: "float32", name: "g", isArray: false, isComplex: false },
+          { type: "float32", name: "b", isArray: false, isComplex: false },
+          { type: "float32", name: "a", isArray: false, isComplex: false }
+        ],
+        "std_msgs/Header": [
+          { type: "uint32", name: "seq", isArray: false, isComplex: false },
+          { type: "time", name: "stamp", isArray: false, isComplex: false },
+          { type: "string", name: "frame_id", isArray: false, isComplex: false }
+        ],
+        "geometry_msgs/Pose": [
+          {
+            type: "geometry_msgs/Point",
+            name: "position",
+            isArray: false,
+            isComplex: true
+          },
+          {
+            type: "geometry_msgs/Quaternion",
+            name: "orientation",
+            isArray: false,
+            isComplex: true
+          }
+        ],
+        "geometry_msgs/Vector3": [
+          { type: "float64", name: "x", isArray: false, isComplex: false },
+          { type: "float64", name: "y", isArray: false, isComplex: false },
+          { type: "float64", name: "z", isArray: false, isComplex: false }
+        ],
+        "geometry_msgs/Point": [
+          { type: "float64", name: "x", isArray: false, isComplex: false },
+          { type: "float64", name: "y", isArray: false, isComplex: false },
+          { type: "float64", name: "z", isArray: false, isComplex: false }
+        ],
+        "geometry_msgs/Quaternion": [
+          { type: "float64", name: "x", isArray: false, isComplex: false },
+          { type: "float64", name: "y", isArray: false, isComplex: false },
+          { type: "float64", name: "z", isArray: false, isComplex: false },
+          { type: "float64", name: "w", isArray: false, isComplex: false }
+        ]
+      };
+
+      function signal() {
+        let resolve;
+        let reject;
+        const promise = new Promise((res, rej) => {
+          resolve = res;
+          reject = rej;
+        });
+        promise.resolve = resolve;
+        promise.reject = reject;
+        return promise;
+      }
+
+      const deleteIdb = async name =>
+        new Promise((resolve, reject) => {
+          const request = indexedDB.deleteDatabase(name);
+          request.onerror = reject;
+          request.onsuccess = resolve;
+          request.onblocked = reject;
+        });
+
+      const STORE_NAME = "store";
+      const open = async name =>
+        new Promise((resolve, reject) => {
+          const request = indexedDB.open(name, 1);
+          request.onerror = reject;
+          request.onsuccess = e => resolve(e.target.result);
+          request.onupgradeneeded = e => {
+            const db = e.target.result;
+            const store = db.createObjectStore(STORE_NAME, {
+              autoIncrement: true
+            });
+            store.transaction.oncomplete = () => {
+              resolve(db);
+            };
+            store.transaction.onerror = reject;
+          };
+        });
+
+      const put = async (db, value, key) =>
+        new Promise(async (resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+          const store = tx.objectStore(STORE_NAME);
+          const request = store.put(value, key);
+          request.onerror = reject;
+        });
+
+      const fill = async db =>
+        new Promise(async (resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+          const store = tx.objectStore(STORE_NAME);
+          for (let i = 0; i < 50; i++) {
+            // 1Mb * 100 = 0.05Gb per database
+            const request = store.put({
+              data: new Uint8Array(1e6).map(_ => Math.random() * 1000) /* 1Mb */
+            });
+            request.onerror = reject;
+          }
+        });
+
+      const read = async db =>
+        new Promise(async (resolve, reject) => {
+          const tx = db.transaction(STORE_NAME);
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+          const store = tx.objectStore(STORE_NAME);
+          store.openCursor.onsuccess = event => {
+            const cursor = event.target.result;
+            if (!cursor) {
+              return;
+            }
+            cursor.continue();
+          };
+        });
+
+      window.tableflowDone = signal();
+
+      (async () => {
+        await Promise.all([
+          (async () => {
+            await window.tableflowDone;
+            const databases = await window.indexedDB.databases();
+            for (const { name } of databases) {
+              if (name.startsWith("b")) {
+                await deleteIdb(name);
+              }
+            }
+            const bDbName = `b-${Math.floor(
+              Math.random() * 10000000
+            )}-IdbCacheDataProviderDb-https://datablaster.robot.car/v2/query/sim?hydra-run-id=a5881847-3a35-5179-969b-f0765872eb71`;
+            const bDb = await open(bDbName);
+            await fill(bDb);
+          })(),
+
+          (async () => {
+            const databases = await window.indexedDB.databases();
+            for (const { name } of databases) {
+              if (name.startsWith("a")) {
+                await deleteIdb(name);
+              }
+            }
+            const aDbName = `a-${Math.floor(
+              Math.random() * 10000000
+            )}-52f5fbee-4f7f-55bb-a953-6e4ddf244319`;
+            const aDb = await open(aDbName);
+            for (const [key, value] of Object.entries(basicDatatypes)) {
+              await put(aDb, value, key);
+            }
+            window.tableflowDone.resolve();
+            await read(aDb);
+          })()
+        ]);
+
+        if (!navigator || !navigator.storage || !navigator.storage.estimate) {
+          throw new Error(
+            "navigator.storage.estimate not supported; this repro only supports the latest version of Google Chrome"
+          );
+        }
+        const estimate = await navigator.storage.estimate();
+        const indexedDB = estimate.usageDetails.indexedDB;
+
+        console.log("Done");
+
+        document.body.innerText = `Total db size: ${indexedDB / 1e6}Mb`;
+      })();
+    </script>
+  </body>
+</html>
