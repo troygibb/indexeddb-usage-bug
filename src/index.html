@@ -215,29 +215,6 @@
 
         proxyMethods(Transaction, "_tx", IDBTransaction, ["abort"]);
 
-        function UpgradeDB(db, oldVersion, transaction) {
-          this._db = db;
-          this.oldVersion = oldVersion;
-          this.transaction = new Transaction(transaction);
-        }
-
-        UpgradeDB.prototype.createObjectStore = function() {
-          return new ObjectStore(
-            this._db.createObjectStore.apply(this._db, arguments)
-          );
-        };
-
-        proxyProperties(UpgradeDB, "_db", [
-          "name",
-          "version",
-          "objectStoreNames"
-        ]);
-
-        proxyMethods(UpgradeDB, "_db", IDBDatabase, [
-          "deleteObjectStore",
-          "close"
-        ]);
-
         function DB(db) {
           this._db = db;
         }
@@ -301,234 +278,15 @@
           };
         });
 
-        var exp = {
-          open: function(name, version, upgradeCallback) {
-            var p = promisifyRequestCall(indexedDB, "open", [name, version]);
-            var request = p.request;
-
-            if (request) {
-              request.onupgradeneeded = function(event) {
-                if (upgradeCallback) {
-                  upgradeCallback(
-                    new UpgradeDB(
-                      request.result,
-                      event.oldVersion,
-                      request.transaction
-                    )
-                  );
-                }
-              };
-            }
-
-            return p.then(function(db) {
-              return new DB(db);
-            });
-          },
-          delete: function(name) {
-            return promisifyRequestCall(indexedDB, "deleteDatabase", [name]);
-          }
-        };
-
-        if (typeof module !== "undefined") {
-          module.exports = exp;
-          module.exports.default = module.exports;
-        } else {
-          self.idb = exp;
-        }
+        self.DB = DB;
       })();
     </script>
+
     <script>
-      const basicDatatypes = {
-        something: [
-          {
-            isArray: true,
-            isComplex: true,
-            name: "markers",
-            type: "visualization_msgs/Marker",
-            arrayLength: undefined
-          },
-          {
-            isArray: true,
-            isComplex: true,
-            name: "futureMarkers",
-            type: "visualization_msgs/Marker",
-            arrayLength: undefined
-          }
-        ],
-        "visualization_msgs/MarkerArray": [
-          {
-            isArray: true,
-            isComplex: true,
-            arrayLength: undefined,
-            name: "markers",
-            type: "visualization_msgs/Marker"
-          }
-        ],
-        "visualization_msgs/Marker": [
-          { type: "uint8", name: "ARROW", isConstant: true, value: 0 },
-          { type: "uint8", name: "CUBE", isConstant: true, value: 1 },
-          { type: "uint8", name: "SPHERE", isConstant: true, value: 2 },
-          { type: "uint8", name: "CYLINDER", isConstant: true, value: 3 },
-          { type: "uint8", name: "LINE_STRIP", isConstant: true, value: 4 },
-          { type: "uint8", name: "LINE_LIST", isConstant: true, value: 5 },
-          { type: "uint8", name: "CUBE_LIST", isConstant: true, value: 6 },
-          { type: "uint8", name: "SPHERE_LIST", isConstant: true, value: 7 },
-          { type: "uint8", name: "POINTS", isConstant: true, value: 8 },
-          {
-            type: "uint8",
-            name: "TEXT_VIEW_FACING",
-            isConstant: true,
-            value: 9
-          },
-          { type: "uint8", name: "MESH_RESOURCE", isConstant: true, value: 10 },
-          { type: "uint8", name: "TRIANGLE_LIST", isConstant: true, value: 11 },
-          { type: "uint8", name: "ADD", isConstant: true, value: 0 },
-          { type: "uint8", name: "MODIFY", isConstant: true, value: 0 },
-          { type: "uint8", name: "DELETE", isConstant: true, value: 2 },
-          {
-            type: "std_msgs/Header",
-            name: "header",
-            isArray: false,
-            isComplex: true
-          },
-          { type: "string", name: "ns", isArray: false, isComplex: false },
-          { type: "int32", name: "id", isArray: false, isComplex: false },
-          { type: "int32", name: "type", isArray: false, isComplex: false },
-          { type: "int32", name: "action", isArray: false, isComplex: false },
-          {
-            type: "geometry_msgs/Pose",
-            name: "pose",
-            isArray: false,
-            isComplex: true
-          },
-          {
-            type: "geometry_msgs/Vector3",
-            name: "scale",
-            isArray: false,
-            isComplex: true
-          },
-          {
-            type: "std_msgs/ColorRGBA",
-            name: "color",
-            isArray: false,
-            isComplex: true
-          },
-          {
-            type: "duration",
-            name: "lifetime",
-            isArray: false,
-            isComplex: false
-          },
-          {
-            type: "bool",
-            name: "frame_locked",
-            isArray: false,
-            isComplex: false
-          },
-          {
-            type: "geometry_msgs/Point",
-            name: "points",
-            isArray: true,
-            arrayLength: undefined,
-            isComplex: true
-          },
-          {
-            type: "std_msgs/ColorRGBA",
-            name: "colors",
-            isArray: true,
-            arrayLength: undefined,
-            isComplex: true
-          },
-          { type: "string", name: "text", isArray: false, isComplex: false },
-          {
-            type: "string",
-            name: "mesh_resource",
-            isArray: false,
-            isComplex: false
-          },
-          {
-            type: "bool",
-            name: "mesh_use_embedded_materials",
-            isArray: false,
-            isComplex: false
-          }
-        ],
-        "std_msgs/ColorRGBA": [
-          { type: "float32", name: "r", isArray: false, isComplex: false },
-          { type: "float32", name: "g", isArray: false, isComplex: false },
-          { type: "float32", name: "b", isArray: false, isComplex: false },
-          { type: "float32", name: "a", isArray: false, isComplex: false }
-        ],
-        "std_msgs/Header": [
-          { type: "uint32", name: "seq", isArray: false, isComplex: false },
-          { type: "time", name: "stamp", isArray: false, isComplex: false },
-          { type: "string", name: "frame_id", isArray: false, isComplex: false }
-        ],
-        "geometry_msgs/Pose": [
-          {
-            type: "geometry_msgs/Point",
-            name: "position",
-            isArray: false,
-            isComplex: true
-          },
-          {
-            type: "geometry_msgs/Quaternion",
-            name: "orientation",
-            isArray: false,
-            isComplex: true
-          }
-        ],
-        "geometry_msgs/Vector3": [
-          { type: "float64", name: "x", isArray: false, isComplex: false },
-          { type: "float64", name: "y", isArray: false, isComplex: false },
-          { type: "float64", name: "z", isArray: false, isComplex: false }
-        ],
-        "geometry_msgs/Point": [
-          { type: "float64", name: "x", isArray: false, isComplex: false },
-          { type: "float64", name: "y", isArray: false, isComplex: false },
-          { type: "float64", name: "z", isArray: false, isComplex: false }
-        ],
-        "geometry_msgs/Quaternion": [
-          { type: "float64", name: "x", isArray: false, isComplex: false },
-          { type: "float64", name: "y", isArray: false, isComplex: false },
-          { type: "float64", name: "z", isArray: false, isComplex: false },
-          { type: "float64", name: "w", isArray: false, isComplex: false }
-        ]
-      };
-
       class Database {
-        // gets a database at the specified version and handles creating object stores
-        // and indexes based on the supplied DatabaseDefinition object
-        static async get(definition) {
-          const { name, version, objectStores } = definition;
-          console.log("getting", name);
-          const db = await idb.open(name, version, change => {
-            [...change.objectStoreNames].forEach(name =>
-              change.deleteObjectStore(name)
-            );
-            console.log("creating object store...", objectStores);
-            objectStores.forEach(storeDefinition => {
-              const { indexes = [] } = storeDefinition;
-              const store = change.createObjectStore(
-                storeDefinition.name,
-                storeDefinition.options
-              );
-              indexes.forEach(index => {
-                store.createIndex(index.name, index.keyPath);
-              });
-            });
-          });
-          return new Database(db);
-        }
-
         constructor(db) {
           this.db = db;
         }
-
-        close() {
-          return this.db.close();
-        }
-
         // put a single value with an optional key - uses autoIncrement if no key provided - returns the key
         async put(objectStore, value, key) {
           const tx = this.transaction(objectStore, "readwrite");
@@ -554,6 +312,23 @@
         return promise;
       }
 
+      const open = async name =>
+        new Promise((resolve, reject) => {
+          const request = indexedDB.open(name, 1);
+          request.onerror = reject;
+          request.onsuccess = e => resolve(e.target.result);
+          request.onupgradeneeded = e => {
+            const db = e.target.result;
+            const store = db.createObjectStore(STORE_NAME, {
+              autoIncrement: true
+            });
+            store.transaction.oncomplete = () => {
+              resolve(db);
+            };
+            store.transaction.onerror = reject;
+          };
+        });
+
       const deleteIdb = async name =>
         new Promise((resolve, reject) => {
           console.log("deleting...");
@@ -576,24 +351,16 @@
                 await deleteIdb(name);
               }
             }
-            const aDbName = `a-${Math.floor(
-              Math.random() * 10000000
-            )}-52f5fbee-4f7f-55bb-a953-6e4ddf244319`;
-            const aDb = await Database.get({
-              name: aDbName,
-              version: 1,
-              objectStores: [
-                {
-                  name: STORE_NAME,
-                  options: {
-                    autoIncrement: true
-                  }
-                }
-              ]
-            });
-            for (const [key, value] of Object.entries(basicDatatypes)) {
-              await aDb.put(STORE_NAME, value, key);
+            const aDbName = `a-${Math.floor(Math.random() * 10000000)}`;
+            const db = await open(aDbName);
+            const aDb = new Database(new DB(db));
+            for (const _ of new Array(5 /* 0.5Mb */).fill(null)) {
+              const message = new Uint8Array(1e5 /* 0.1Mb */).map(
+                _ => Math.random() * 1000
+              );
+              await aDb.put(STORE_NAME, message);
             }
+
             window.tableflowDone.resolve();
             const tx = aDb.transaction([STORE_NAME]);
             const store = tx.objectStore(STORE_NAME);
@@ -613,32 +380,16 @@
                 await deleteIdb(name);
               }
             }
-            const bDbName = `b-IdbCacheDataProviderDb-https://datablaster.robot.car/v2/query/sim?hydra-run-id=a5881847-3a35-5179-969b-f0765872eb71-${Math.floor(
-              Math.random() * 10000000
-            )}`;
-            const bDb = await Database.get({
-              name: bDbName,
-              version: 1,
-              objectStores: [
-                {
-                  name: STORE_NAME,
-                  options: {
-                    autoIncrement: true
-                  }
-                }
-              ]
-            });
-            const tx = bDb.transaction([STORE_NAME], "readwrite");
-            const messagesStore = tx.objectStore(STORE_NAME);
-            for (const _ of new Array(50).fill(null)) {
-              const message = new Uint8Array(1e6).map(
+            const bDbName = `b-${Math.floor(Math.random() * 10000000)}`;
+            const db = await open(bDbName);
+            const bDb = new Database(new DB(db));
+
+            for (const _ of new Array(50 /* 50Mb */).fill(null)) {
+              const message = new Uint8Array(1e6 /* 1Mb */).map(
                 _ => Math.random() * 1000
-              ); /* 0.1Mb */
-              messagesStore.put({
-                message
-              });
+              );
+              await bDb.put(STORE_NAME, message);
             }
-            await tx.complete;
           })()
         ]);
 
