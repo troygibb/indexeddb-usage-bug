@@ -564,81 +564,6 @@
         });
 
       const STORE_NAME = "store";
-      // const open = async name =>
-      // new Promise((resolve, reject) => {
-      // const request = indexedDB.open(name, 1);
-      // request.onerror = reject;
-      // request.onsuccess = e => resolve(e.target.result);
-      // request.onupgradeneeded = e => {
-      // const db = e.target.result;
-      // const store = db.createObjectStore(STORE_NAME, {
-      // autoIncrement: true
-      // });
-      // store.transaction.oncomplete = () => {
-      // resolve(db);
-      // };
-      // store.transaction.onerror = reject;
-      // };
-      // });
-
-      const openIdb = async definition => {
-        const { name, version, objectStores } = definition;
-        const db = await idb.open(name, version, change => {
-          [...change.objectStoreNames].forEach(name =>
-            change.deleteObjectStore(name)
-          );
-          objectStores.forEach(storeDefinition => {
-            const { indexes = [] } = storeDefinition;
-            const store = change.createObjectStore(
-              storeDefinition.name,
-              storeDefinition.options
-            );
-            indexes.forEach(index => {
-              store.createIndex(index.name, index.keyPath);
-            });
-          });
-        });
-      };
-
-      const put = async (db, value, key) =>
-        new Promise(async (resolve, reject) => {
-          const tx = db.transaction(STORE_NAME, "readwrite");
-          tx.oncomplete = resolve;
-          tx.onerror = reject;
-          const store = tx.objectStore(STORE_NAME);
-          const request = store.put(value, key);
-          request.onerror = reject;
-        });
-
-      const fill = async db =>
-        new Promise(async (resolve, reject) => {
-          const tx = db.transaction(STORE_NAME, "readwrite");
-          tx.oncomplete = resolve;
-          tx.onerror = reject;
-          const store = tx.objectStore(STORE_NAME);
-          for (let i = 0; i < 50; i++) {
-            // 1Mb * 100 = 0.05Gb per database
-            const request = store.put({
-              data: new Uint8Array(1e6).map(_ => Math.random() * 1000) /* 1Mb */
-            });
-            request.onerror = reject;
-          }
-        });
-
-      const read = async db =>
-        new Promise(async (resolve, reject) => {
-          const tx = db.transaction(STORE_NAME);
-          tx.oncomplete = resolve;
-          tx.onerror = reject;
-          const store = tx.objectStore(STORE_NAME);
-          store.openCursor.onsuccess = event => {
-            const cursor = event.target.result;
-            if (!cursor) {
-              return;
-            }
-            cursor.continue();
-          };
-        });
 
       window.tableflowDone = signal();
 
@@ -716,41 +641,6 @@
             await tx.complete;
           })()
         ]);
-
-        // (async () => {
-        // await Promise.all([
-        // (async () => {
-        // const databases = await window.indexedDB.databases();
-        // for (const { name } of databases) {
-        // if (name.startsWith("a")) {
-        // await deleteIdb(name);
-        // }
-        // }
-        // const aDbName = `a-${Math.floor(
-        // Math.random() * 10000000
-        // )}-52f5fbee-4f7f-55bb-a953-6e4ddf244319`;
-        // const aDb = await open(aDbName);
-        // for (const [key, value] of Object.entries(basicDatatypes)) {
-        // await put(aDb, value, key);
-        // }
-        // window.tableflowDone.resolve();
-        // await read(aDb);
-        // })(),
-        // (async () => {
-        // await window.tableflowDone;
-        // const databases = await window.indexedDB.databases();
-        // for (const { name } of databases) {
-        // if (name.startsWith("b")) {
-        // await deleteIdb(name);
-        // }
-        // }
-        // const bDbName = `b-IdbCacheDataProviderDb-https://datablaster.robot.car/v2/query/sim?hydra-run-id=a5881847-3a35-5179-969b-f0765872eb71-${Math.floor(
-        // Math.random() * 10000000
-        // )}`;
-        // const bDb = await open(bDbName);
-        // await fill(bDb);
-        // })()
-        // ]);
 
         if (!navigator || !navigator.storage || !navigator.storage.estimate) {
           throw new Error(
