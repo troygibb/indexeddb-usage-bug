@@ -338,6 +338,20 @@
           request.onblocked = reject;
         });
 
+      const fill = async (db, mb) =>
+        new Promise(async (resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+          const store = tx.objectStore(STORE_NAME);
+          for (let i = 0; i < mb; i++) {
+            const request = store.add({
+              data: new Uint8Array(1e6).map(_ => Math.random() * 1000) /* 1Mb */
+            });
+            request.onerror = reject;
+          }
+        });
+
       const STORE_NAME = "store";
 
       window.tableflowDone = signal();
@@ -382,14 +396,7 @@
             }
             const bDbName = `b-${Math.floor(Math.random() * 10000000)}`;
             const db = await open(bDbName);
-            const bDb = new Database(new DB(db));
-
-            for (const _ of new Array(50 /* 50Mb */).fill(null)) {
-              const message = new Uint8Array(1e6 /* 1Mb */).map(
-                _ => Math.random() * 1000
-              );
-              await bDb.put(STORE_NAME, message);
-            }
+            await fill(db, 50);
           })()
         ]);
 

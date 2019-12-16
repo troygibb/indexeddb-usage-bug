@@ -19,13 +19,12 @@ Multiple concurrent IndexedDB operations leads to linearly increasing disk usage
 
 ### Does this feature work correctly in other browsers?
 
-
+[ todo ]
 
 ### Steps to reproduce the problem:
 
 
 ### What is the expected behavior?
-
 
 ### What went wrong?
 
