@@ -23,8 +23,8 @@ Yes -- although I've only tested in Firefox. I assume the behavior is different 
 1. Load the provided ![index.html](./index.html) file.
 2. Wait until `Total IndexedDB size` message is produced.
 3. Reload.
-4. Observe that the IndexedDB size is now approximately double what it was after the first load.
-5. Repeat and watch the IndexedDB size linearly increase, even though the number of databases remains constant.
+4. Observe that the IndexedDB size is now much higher than it was after the first load.
+5. Repeat and watch the IndexedDB size approximately linearly increase, even though the number of databases remains constant.
 
 ### What is the expected behavior?
 
