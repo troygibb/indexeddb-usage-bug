@@ -2,6 +2,8 @@
 <html>
   <body>
     <script>
+      document.body.innerText = "Waiting...";
+
       const openDb = async name =>
         new Promise((resolve, reject) => {
           const request = indexedDB.open(name, 1);
@@ -84,10 +86,14 @@
             "navigator.storage.estimate not supported; this repro only supports the latest version of Google Chrome"
           );
         }
+
+        const dbs = await window.indexedDB.databases();
         const estimate = await navigator.storage.estimate();
         const indexedDB = estimate.usageDetails.indexedDB;
         document.body.innerText = `Total IndexedDB size: ${indexedDB /
-          1e6}Mb (reload again and this number will increase)`;
+          1e6}Mb (reload again and this number will increase if the bug is present)\n
+          Number of databases: ${dbs.length}\n
+          Each database is filled with the same amount of data, so the total size should not be increasing.`;
       })();
     </script>
   </body>
