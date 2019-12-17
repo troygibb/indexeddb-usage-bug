@@ -4,7 +4,7 @@ Reproduces a chrome bug that results in runaway indexeddb usage.
 
 ## Chrome bug submission
 
-TBD
+[Issue 1035025: Multiple concurrent IndexedDB delete, open, fill and openCursor operations leads to linearly increasing disk usage](https://bugs.chromium.org/p/chromium/issues/detail?id=1035025)
 
 ### Please enter a one-line summary
 
