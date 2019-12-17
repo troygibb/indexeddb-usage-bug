@@ -12,7 +12,7 @@ Multiple concurrent IndexedDB delete, open, fill and openCursor operations leads
 
 ### Do you have a reduced test case?
 
-See ![index.html](./index.html).
+See ![index.html](./index.html), or view it hosted here: https://troygibb.github.io/indexeddb-usage-bug/.
 
 ### Does this feature work correctly in other browsers?
 
@@ -20,7 +20,7 @@ Yes -- although I've only tested in Firefox. I assume the behavior is different 
 
 ### Steps to reproduce the problem:
 
-1. Load the provided ![index.html](./index.html) file.
+1. Load the provided ![index.html](./index.html) file (or go here: https://troygibb.github.io/indexeddb-usage-bug/).
 2. Wait until `Total IndexedDB size` message is produced.
 3. Reload.
 4. Observe that the IndexedDB size is now much higher than it was after the first load.
@@ -28,11 +28,11 @@ Yes -- although I've only tested in Firefox. I assume the behavior is different 
 
 ### What is the expected behavior?
 
-That the `deleteDatabase` operations that proceed each newly created IndexedDB database would lead to constant memory usage.
+That the `deleteDatabase` operations that proceed each newly created IndexedDB database would lead to constant disk usage.
 
 ### What went wrong?
 
-As memory usage increases, our web app becomes increasingly sluggish.
+As disk usage increases, our web app becomes increasingly sluggish, and eventually, unusable.
 
 ### Did this work before?
 
