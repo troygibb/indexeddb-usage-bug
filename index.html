@@ -1,7 +1,94 @@
 <!DOCTYPE html>
 <html>
   <body>
-    <div id="root"></div>
-    <script src="dist/main.js"></script>
+    <script>
+      const openDb = async name =>
+        new Promise((resolve, reject) => {
+          const request = indexedDB.open(name, 1);
+          request.onupgradeneeded = e => {
+            const db = e.target.result;
+            const store = db.createObjectStore(STORE_NAME, {
+              autoIncrement: true
+            });
+            store.transaction.oncomplete = () => {
+              resolve(db);
+            };
+          };
+        });
+
+      const deleteDb = async name =>
+        new Promise((resolve, reject) => {
+          const request = indexedDB.deleteDatabase(name);
+          request.onerror = reject;
+          request.onsuccess = resolve;
+          request.onblocked = reject;
+        });
+
+      const fillDb = async (db, mb) =>
+        new Promise(async (resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+          const store = tx.objectStore(STORE_NAME);
+          for (let i = 0; i < mb; i++) {
+            const request = store.add({
+              data: new Uint8Array(1e6).map(_ => Math.random() * 1000) /* 1Mb */
+            });
+            request.onerror = reject;
+          }
+        });
+
+      const STORE_NAME = "store";
+      const SUFFIX = Math.floor(Math.random() * 10000000);
+
+      // REPRO LOGIC
+      (async () => {
+        const databases = await window.indexedDB.databases();
+        for (const { name } of databases) {
+          if (name.startsWith("a")) {
+            await deleteDb(name);
+          }
+        }
+        const aDbName = `a-${SUFFIX}`;
+        const db = await openDb(aDbName);
+        await fillDb(db, 5 /* Mb */);
+
+        await Promise.all([
+          (async () =>
+            new Promise(async (resolve, reject) => {
+              const tx = db.transaction(STORE_NAME);
+              tx.oncomplete = resolve;
+              const store = tx.objectStore(STORE_NAME);
+              store.openCursor().onsuccess = event => {
+                const cursor = event.target.result;
+                if (!cursor) return;
+                cursor.continue();
+              };
+            }))(),
+          (async () => {
+            const databases = await window.indexedDB.databases();
+            for (const { name } of databases) {
+              if (name.startsWith("b")) {
+                await deleteDb(name);
+              }
+            }
+            const bDbName = `b-${SUFFIX}`;
+            const db = await openDb(bDbName);
+            await fillDb(db, 50 /* Mb */);
+          })()
+        ]);
+
+        // REPORTING
+        if (!navigator || !navigator.storage || !navigator.storage.estimate) {
+          throw new Error(
+            "navigator.storage.estimate not supported; this repro only supports the latest version of Google Chrome"
+          );
+        }
+        const estimate = await navigator.storage.estimate();
+        const indexedDB = estimate.usageDetails.indexedDB;
+        document.body.innerText = `Total IndexedDB size: ${indexedDB /
+          1e6}Mb (reload again and this number will increase)`;
+      })();
+    </script>
   </body>
 </html>
